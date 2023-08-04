@@ -49,6 +49,7 @@ input:focus{
 }
 
 .button-container>*{
+  margin-left: 10px;
   font-size: 12pt;
   cursor: pointer;
   font-family: 'Roboto', sans-serif;
@@ -57,6 +58,12 @@ input:focus{
   color: rgb(247, 247, 247);
   border: none;
   border-radius: 10px;
+  height: 40px;
+}
+
+.button-container>*:focus{
+  border: none;
+  height: 40px;
 }
 
 form{

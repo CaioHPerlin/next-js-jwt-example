@@ -37,7 +37,7 @@ app.get('/', async function(req, res){
 })
 
 app.post('/logar', (req, res) => {
-  
+  res.send("Você está autenticado!")
 })
 
 app.post('/deslogar', function(req, res) {
