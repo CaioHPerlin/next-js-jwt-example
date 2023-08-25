@@ -37,7 +37,7 @@ app.post('/usuarios/cadastrar', async function(req,res){
   if(csenha == senha){
     await usuario.create(req.body);
     res.redirect('/');
-  } else(res.status(500).json({mensagem: 'Senhas inseridas não batem.'}))
+  } else(res.status(500).json({mensagem: 'As senhas inseridas não são iguais.'}))
 })
 
 app.get('/autenticar', async function(req, res){
@@ -45,7 +45,8 @@ app.get('/autenticar', async function(req, res){
 })
 
 app.get('/', async function(req, res){
-  res.render("home")
+  const usuarios = await usuario.findAll();
+  res.render('home', {registro: usuarios});
 })
 
 app.post('/logar', (req, res) => {
