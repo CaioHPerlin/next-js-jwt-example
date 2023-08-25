@@ -33,14 +33,11 @@ app.get('/usuarios/cadastrar', async function(req, res){
 })
 
 app.post('/usuarios/cadastrar', async function(req,res){
-  let {usuario, senha, csenha} = req.body;
-  if(csenha == senha) {
-    return res.json({
-      usuario: usuario,
-      senha: senha,
-      csenha: csenha,
-    })
-  } else(res.status(500).json({mensagem: "Suas senhas não são idênticas!"}))
+  let {senha, csenha} = req.body;
+  if(csenha == senha){
+    await usuario.create(req.body);
+    res.redirect('/');
+  } else(res.status(500).json({mensagem: 'Senhas inseridas não batem.'}))
 })
 
 app.get('/autenticar', async function(req, res){
