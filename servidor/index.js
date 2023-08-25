@@ -28,14 +28,22 @@ app.use(
   }).unless({ path: ["/autenticar", "/logar", "/deslogar", "/usuarios/cadastrar"] })
 );
 
-app.get('/usuarios/cadastrar', async function(req, res){
+app.get('/usuarios/listar', async function(req, res) {
+  const usuarios = await usuario.findAll();
+  res.render('listar', {registro: usuarios})
+})
+
+app.get('/usuarios/cadastrar', function(req, res){
   res.render('cadastrar');
 })
 
 app.post('/usuarios/cadastrar', async function(req,res){
   let {senha, csenha} = req.body;
   if(csenha == senha){
-    await usuario.create(req.body);
+    const novoUsuario = await usuario.create(req.body);
+    const id = novoUsuario.id;
+    const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
+    res.cookie('token', token, { httpOnly: true })
     res.redirect('/');
   } else(res.status(500).json({mensagem: 'As senhas inseridas não são iguais.'}))
 })
@@ -44,22 +52,19 @@ app.get('/autenticar', async function(req, res){
   res.render('autenticar');
 })
 
-app.get('/', async function(req, res){
-  const usuarios = await usuario.findAll();
-  res.render('home', {registro: usuarios});
+app.get('/', function(req, res){
+  res.render('home');
 })
 
-app.post('/logar', (req, res) => {
-  const { usuario, senha } = req.body;
-  if(usuario == 'Picolo' && senha == '123'){
-    const id = 1;
-    const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
-
-    res.cookie('token', token, { httpOnly: true })
-    return res.json({
-      user: usuario,
-      token: token
-    })
+app.post('/logar', async function(req, res) {
+  const registro = await usuario.findAll();
+  for(let i = 0; i < registro.length; i++){
+    if(req.body.usuario == registro[i].usuario && req.body.senha == registro[i].senha){
+      const id = registro[i].id;
+      const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
+      res.cookie('token', token, { httpOnly: true })
+      return res.redirect('/')
+    }
   }
 
   res.status(500).json({ message: 'Credenciais inválidas' })
@@ -67,7 +72,7 @@ app.post('/logar', (req, res) => {
 
 app.post('/deslogar', function(req, res) {
   res.cookie('token', null, { httpOnly: true })
-  res.json({ deslogado: true })
+  res.redirect('/autenticar')
 })
 
 app.listen(3000, function() {

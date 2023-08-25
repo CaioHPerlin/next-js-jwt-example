@@ -8,10 +8,18 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+  <main>
+    <h1>Usuários Cadastrados</h1>
+    <ul class="block-container">
+      <% registro.map(usuario => { %>
+        <li><%= usuario.id %> - <%= usuario.usuario %></li>
+      <% }) %>
+    </ul>
     <form action="/deslogar" method="post">
       <div class="button-container">
         <input type="submit" value="Deslogar">
       </div>
     </form>
+  </main>
 </body>
 </html>
