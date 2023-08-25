@@ -10,11 +10,11 @@
 <body>
   <main>
     <h1>Cadastre-se</h1>
-    <form onsubmit="check()" action="cadastrar" method="POST">
+    <form action="/usuarios/cadastrar" method="POST">
       <div class="input-container">
         <input required type="text" placeholder="Usuário" name="usuario">
         <input required type="password" placeholder="Senha" name="senha">
-        <input required type="password" placeholder="Confirme sua Senha" name="senha">
+        <input required type="password" placeholder="Confirme sua Senha" name="csenha">
       </div>
       <div class="button-container">
         <input type="reset" value="Limpar">
@@ -22,15 +22,5 @@
       </div>
     </form>
   </main>
-  <script>
-    const check = () => {
-        const c1 = document.getElementsByName("senha")[0].value;
-        const c2 = document.getElementsByName("senha")[1].value;
-
-        if(c1 != c2){ 
-            alert("As senhas não batem"); 
-        }
-    }
-  </script>
 </body>
 </html>

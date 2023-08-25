@@ -32,6 +32,17 @@ app.get('/usuarios/cadastrar', async function(req, res){
   res.render('cadastrar');
 })
 
+app.post('/usuarios/cadastrar', async function(req,res){
+  let {usuario, senha, csenha} = req.body;
+  if(csenha == senha) {
+    return res.json({
+      usuario: usuario,
+      senha: senha,
+      csenha: csenha,
+    })
+  } else(res.status(500).json({mensagem: "Suas senhas não são idênticas!"}))
+})
+
 app.get('/autenticar', async function(req, res){
   res.render('autenticar');
 })
@@ -41,7 +52,7 @@ app.get('/', async function(req, res){
 })
 
 app.post('/logar', (req, res) => {
-  const { usuario, senha } = req.body
+  const { usuario, senha } = req.body;
   if(usuario == 'Picolo' && senha == '123'){
     const id = 1;
     const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
