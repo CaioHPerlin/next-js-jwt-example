@@ -1,3 +1,6 @@
+// Crypto
+const crypto = require('./crypto');
+
 // JWT
 require("dotenv-safe").config();
 const jwt = require('jsonwebtoken');
@@ -40,7 +43,11 @@ app.get('/usuarios/cadastrar', function(req, res){
 app.post('/usuarios/cadastrar', async function(req,res){
   let {senha, csenha} = req.body;
   if(csenha == senha){
-    const novoUsuario = await usuario.create(req.body);
+    let senhaCriptografada = crypto.encrypt(senha);
+    const novoUsuario = await usuario.create({
+      usuario: req.body.usuario,
+      senha: senhaCriptografada
+    });
     const id = novoUsuario.id;
     const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
     res.cookie('token', token, { httpOnly: true })
@@ -58,15 +65,15 @@ app.get('/', function(req, res){
 
 app.post('/logar', async function(req, res) {
   const registro = await usuario.findAll();
+
   for(let i = 0; i < registro.length; i++){
-    if(req.body.usuario == registro[i].usuario && req.body.senha == registro[i].senha){
+    if(req.body.usuario == registro[i].usuario && req.body.senha == senhaDescriptografada){
       const id = registro[i].id;
       const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
       res.cookie('token', token, { httpOnly: true })
       return res.redirect('/')
     }
   }
-
   res.status(500).json({ message: 'Credenciais inválidas' })
 })
 
