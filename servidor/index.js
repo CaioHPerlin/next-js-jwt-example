@@ -67,11 +67,14 @@ app.post('/logar', async function(req, res) {
   const registro = await usuario.findAll();
 
   for(let i = 0; i < registro.length; i++){
-    if(req.body.usuario == registro[i].usuario && req.body.senha == senhaDescriptografada){
-      const id = registro[i].id;
-      const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
-      res.cookie('token', token, { httpOnly: true })
-      return res.redirect('/')
+    if(req.body.usuario == registro[i].usuario){
+      const senhaRegistro = crypto.decrypt(registro[i].senha);
+      if(req.body.senha == senhaRegistro){
+        const id = registro[i].id;
+        const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
+        res.cookie('token', token, { httpOnly: true })
+        return res.redirect('/')
+      }
     }
   }
   res.status(500).json({ message: 'Credenciais inválidas' })
