@@ -48,6 +48,7 @@ app.post('/usuarios/cadastrar', async function(req,res){
       usuario: req.body.usuario,
       senha: senhaCriptografada
     });
+    
     const id = novoUsuario.id;
     const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
     res.cookie('token', token, { httpOnly: true })
@@ -64,18 +65,13 @@ app.get('/', function(req, res){
 })
 
 app.post('/logar', async function(req, res) {
-  const registro = await usuario.findAll();
-
-  for(let i = 0; i < registro.length; i++){
-    if(req.body.usuario == registro[i].usuario){
-      const senhaRegistro = crypto.decrypt(registro[i].senha);
-      if(req.body.senha == senhaRegistro){
-        const id = registro[i].id;
-        const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
-        res.cookie('token', token, { httpOnly: true })
-        return res.redirect('/')
-      }
-    }
+  const registro = await usuario.findOne({ where: { usuario: req.body.usuario} })
+  const senhaRegistro = crypto.decrypt(registro.senha);
+  if(req.body.senha == senhaRegistro){
+    const id = registro.id;
+    const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
+    res.cookie('token', token, { httpOnly: true })
+    return res.redirect('/')
   }
   res.status(500).json({ message: 'Credenciais inválidas' })
 })
