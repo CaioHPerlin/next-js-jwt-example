@@ -62,15 +62,15 @@ app.get('/', function(req, res){
 })
 
 app.post('/logar', async function(req, res) {
-  const registro = await usuario.findOne({ where: { usuario: req.body.usuario} })
+  const registro = await usuario.findOne({ where: { usuario: req.body.usuario } })
+  if(!registro) return res.status(500).json({ message: 'Credenciais inválidas '})
   const senhaRegistro = crypto.decrypt(registro.senha);
-  if(req.body.senha == senhaRegistro){
+  if(registro && req.body.senha == senhaRegistro){
     const id = registro.id;
     const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
     res.cookie('token', token, { httpOnly: true })
     return res.redirect('/')
   }
-  res.status(500).json({ message: 'Credenciais inválidas' })
 })
 
 app.post('/deslogar', function(req, res) {
