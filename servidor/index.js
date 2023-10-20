@@ -44,15 +44,12 @@ app.post('/usuarios/cadastrar', async function(req,res){
   let {senha, csenha} = req.body;
   if(csenha == senha){
     let senhaCriptografada = crypto.encrypt(senha);
-    const novoUsuario = await usuario.create({
+    await usuario.create({
       usuario: req.body.usuario,
       senha: senhaCriptografada
     });
-    
-    const id = novoUsuario.id;
-    const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
-    res.cookie('token', token, { httpOnly: true })
-    res.redirect('/');
+
+    res.redirect('/usuarios/listar');
   } else(res.status(500).json({mensagem: 'As senhas inseridas não são iguais.'}))
 })
 
@@ -83,4 +80,4 @@ app.post('/deslogar', function(req, res) {
 
 app.listen(3000, function() {
   console.log('App de Exemplo escutando na porta 3000!')
-});
+}); ''
