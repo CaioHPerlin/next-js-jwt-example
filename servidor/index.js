@@ -5,7 +5,16 @@ const crypto = require('./crypto');
 require("dotenv-safe").config();
 const jwt = require('jsonwebtoken');
 var { expressjwt: expressJWT } = require("express-jwt");
+
 const cors = require('cors');
+
+const corsOptions = {
+  origin: "http://localhost:3000",
+  methods: "GET,PUT,POST,DELETE",
+
+  allowedHeaders:"Content-Type, Authorization",
+  credentials: true
+}
 
 var cookieParser = require('cookie-parser')
 
@@ -16,7 +25,7 @@ const app = express();
 
 app.set('view engine', 'ejs');
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
@@ -33,7 +42,8 @@ app.use(
 
 app.get('/usuarios/listar', async function(req, res) {
   const usuarios = await usuario.findAll();
-  res.render('listar', {registro: usuarios})
+  res.json(usuarios)
+  //res.render('listar', {registro: usuarios})
 })
 
 app.get('/usuarios/cadastrar', function(req, res){
@@ -62,14 +72,16 @@ app.get('/', function(req, res){
 })
 
 app.post('/logar', async function(req, res) {
-  const registro = await usuario.findOne({ where: { usuario: req.body.usuario, senha: crypto.encrypt(req.body.senha) } })
+  const registro = await usuario.findOne({ where: { usuario: req.body.name, senha: crypto.encrypt(req.body.password) } })
   if(registro){
     const id = registro.id;
     const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
-    res.cookie('token', token, { httpOnly: true })
-    return res.redirect('/')
+    return res.cookie('token', token, { httpOnly: true }).json({
+      name: registro.usuario,
+      token: token
+    })
   }
-  return res.status(500).json({ message: 'Credenciais inválidas '})
+  return res.status(500).json({ message: 'Credenciais inválidas '});
 })
 
 app.post('/deslogar', function(req, res) {
@@ -77,6 +89,6 @@ app.post('/deslogar', function(req, res) {
   res.redirect('/autenticar')
 })
 
-app.listen(3000, function() {
-  console.log('App de Exemplo escutando na porta 3000!')
+app.listen(3001, function() {
+  console.log('App de Exemplo escutando na porta 3001!')
 }); ''
