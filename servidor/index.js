@@ -81,7 +81,7 @@ app.post('/logar', async function(req, res) {
       token: token
     })
   }
-  return res.status(500).json({ message: 'Credenciais inválidas '});
+  //return res.status(500).json({ message: 'Credenciais inválidas '});
 })
 
 app.post('/deslogar', function(req, res) {

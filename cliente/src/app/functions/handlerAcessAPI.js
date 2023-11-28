@@ -41,15 +41,16 @@ const createUser = async (user) => {
 
 const getUsers = async () => {
     try{
-        const response = await fetch(databaseUrl + "/users", { 
+        const response = await fetch(databaseUrl + "/usuarios/listar", { 
             method: 'GET',
-            Cookies: getTokenCookie(),
             next: { revalidate: 5 }
         });
         const users = await response.json();
+        console.log(users)
+        
         return users;
-    }catch{
-        return [{name: "Erro de Servidor"}];
+    }catch (err){
+        return [{name: ""+err}];
     }
 }
 
