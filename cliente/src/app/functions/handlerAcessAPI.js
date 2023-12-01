@@ -2,7 +2,7 @@
 
 import { cookies } from "next/dist/client/components/headers";
 
-const getTokenCookie = () => `token=${cookies.get('token').value}`;
+const getTokenCookie = () => `token=${cookies().get('token').value}`
 
 const databaseUrl = 'http://localhost:3001'
 
@@ -12,7 +12,10 @@ const getUserAuthenticated = async (user) => {
         {
             cache:"no-cache",
             method:"POST",
-            headers:{ "Content-Type": "Application/json" },
+            headers:{ 
+                "Content-Type": "Application/json",
+                Cookie: getTokenCookie()
+            },
             body: JSON.stringify(user)
         });
         const userAuth = await response.json();
@@ -24,15 +27,16 @@ const getUserAuthenticated = async (user) => {
 
 const createUser = async (user) => {
     try{
-        const response = await fetch(databaseUrl + "/user", {
+        const response = await fetch(databaseUrl + "/usuarios/cadastrar", {
             method: "POST",
             headers: {
                 "Content-Type": "Application/json",
-                Cookies: getTokenCookie()
+                Cookie: getTokenCookie()
             },
             body: JSON.stringify(user)
         });
         const newUser = await response.json();
+        console.log(newUser)
         return newUser;
     }catch {
         return {};
@@ -41,22 +45,24 @@ const createUser = async (user) => {
 
 const getUsers = async () => {
     try{
-        const response = await fetch(databaseUrl + "/usuarios/listar", { 
+        const response = await fetch(databaseUrl + "/usuarios/listar", {
             method: 'GET',
-            next: { revalidate: 5 }
+            next: { revalidate: 5 },
+            headers: {
+                'Content-Type': 'Application/json',
+                Cookie: getTokenCookie()
+            },
         });
         const users = await response.json();
-        console.log(users)
-        
         return users;
     }catch (err){
-        return [{name: ""+err}];
+        return [{usuario: ""+err}];
     }
 }
 
 const getUser = async (id) => {
     try{
-        const response = await fetch(databaseUrl + "user/" + id, {
+        const response = await fetch(databaseUrl + "/usuario/" + id, {
             method: 'GET',
             headers: {
                 'Content-Type': 'Application/json',
@@ -65,8 +71,16 @@ const getUser = async (id) => {
         });
         const user = await response.json();
         return user
-    } catch {
-        return {};
+    } catch (err) {
+        return {usuario: ""+err};
+    }
+}
+
+const deleteUser = async (id) => {
+    try{
+        console.log(id)
+    }catch{
+
     }
 }
 
@@ -87,4 +101,4 @@ const updateUser = async (user, id) => {
     }
 }
 
-export { getUser, getUsers, getUserAuthenticated, createUser, updateUser };
+export { getUser, getUsers, getUserAuthenticated, createUser, updateUser, deleteUser };

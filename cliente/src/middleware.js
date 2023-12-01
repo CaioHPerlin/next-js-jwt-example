@@ -9,7 +9,7 @@ export const middleware = async (request) => {
     const urlDashboard = new URL('/pages/dashboard', request.url);
     const isTokenValidated = await validateToken(token);
 
-    const restrictURLs = ['/pages/dashboard', '/pages/dashboard/register', '/pages/dashboard/alter']
+    const restrictURLs = ['/pages/dashboard', '/pages/dashboard/register', '/pages/dashboard/alter', '/pages/dashboard/delete']
 
     if (!isTokenValidated || !token) {
         if (restrictURLs.includes(request.nextUrl.pathname)) {
@@ -24,5 +24,5 @@ export const middleware = async (request) => {
 };
 
 export const config = {
-    matcher: ['/', '/pages/dashboard', '/pages/dashboard/register', '/pages/dashboard/alter']
+    matcher: ['/', '/pages/dashboard', '/pages/dashboard/register', '/pages/dashboard/alter', '/pages/dashboard/delete']
 };

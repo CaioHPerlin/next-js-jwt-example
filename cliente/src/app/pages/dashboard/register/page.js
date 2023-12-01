@@ -11,15 +11,17 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function Register(){
     const [user, setUser] = useState({
         name: '',
-        email: '',
-        password: ''
+        password: '',
+        cpassword: ''
     });
     const { push } = useRouter();
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        if(user.name == '' || user.email == '' || user.password == ''){
+        if(user.name == '' || user.password == '' || user.cpassword == ''){
             return toast.error('Há campos não preenchidos!');
+        }else if(user.password != user.cpassword){
+            return toast.error('As senhas inseridas não coincidem!')
         }
 
         try{
@@ -40,16 +42,16 @@ export default function Register(){
                     setUser({ ...user, name: e.target.value });
                 }}/>
                 <input
-                placeholder='E-mail'
-                type='email'
-                onChange={(e) => {
-                    setUser({ ...user, email: e.target.value });
-                }}/>
-                <input
                 placeholder='Senha'
                 type='password'
                 onChange={(e) => {
                     setUser({ ...user, password: e.target.value });
+                }}/>
+                <input
+                placeholder='Confirmação de Senha'
+                type='password'
+                onChange={(e) => {
+                    setUser({ ...user, cpassword: e.target.value });
                 }}/>
                 <div className='justify-self-end mt-5'>
                   <Button type={'reset'} secondary={true}>Limpar</Button>

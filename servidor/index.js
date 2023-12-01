@@ -42,25 +42,35 @@ app.use(
 
 app.get('/usuarios/listar', async function(req, res) {
   const usuarios = await usuario.findAll();
-  res.json(usuarios)
+  res.json(usuarios);
   //res.render('listar', {registro: usuarios})
 })
+
+app.get('/usuario/:id', async function(req, res) {
+  const usuarioId = await usuario.findOne({where: {id: req.params.id}});
+  res.json(usuarioId);
+});
 
 app.get('/usuarios/cadastrar', function(req, res){
   res.render('cadastrar');
 })
 
 app.post('/usuarios/cadastrar', async function(req,res){
-  let {senha, csenha} = req.body;
-  if(csenha == senha){
-    let senhaCriptografada = crypto.encrypt(senha);
+  console.log(req.body)
+  let {password, cpassword} = req.body;
+  if(password == cpassword){
+    let senhaCriptografada = crypto.encrypt(password);
     await usuario.create({
-      usuario: req.body.usuario,
+      usuario: req.body.name,
       senha: senhaCriptografada
     });
-
-    res.redirect('/usuarios/listar');
   } else(res.status(500).json({mensagem: 'As senhas inseridas não são iguais.'}))
+})
+
+app.delete('/usuarios/deletar', async function(req, res) {
+  console.log(req.body)
+  const registro = await usuario.findOne({ where: { id: req.body.id } })
+  
 })
 
 app.get('/autenticar', async function(req, res){
@@ -75,7 +85,7 @@ app.post('/logar', async function(req, res) {
   const registro = await usuario.findOne({ where: { usuario: req.body.name, senha: crypto.encrypt(req.body.password) } })
   if(registro){
     const id = registro.id;
-    const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 300 });
+    const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: 60*60*24 });
     return res.cookie('token', token, { httpOnly: true }).json({
       name: registro.usuario,
       token: token
